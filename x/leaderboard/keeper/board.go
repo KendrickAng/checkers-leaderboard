@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"checkers-leaderboard/x/leaderboard/types"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -30,4 +31,16 @@ func (k Keeper) GetBoard(ctx sdk.Context) (val types.Board, found bool) {
 func (k Keeper) RemoveBoard(ctx sdk.Context) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BoardKey))
 	store.Delete([]byte{0})
+}
+
+func (k Keeper) UpdateBoard(ctx sdk.Context, playerInfoList []types.PlayerInfo) {
+	types.SortPlayerInfo(playerInfoList)
+
+	if types.LeaderboardWinnerLength < uint64(len(playerInfoList)) {
+		playerInfoList = playerInfoList[:types.LeaderboardWinnerLength]
+	}
+
+	k.SetBoard(ctx, types.Board{
+		PlayerInfo: playerInfoList,
+	})
 }

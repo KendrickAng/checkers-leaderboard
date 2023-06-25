@@ -73,7 +73,27 @@ func (k Keeper) OnRecvCandidatePacket(ctx sdk.Context, packet channeltypes.Packe
 		return packetAck, err
 	}
 
-	// TODO: packet reception logic
+	// Override the entry
+	k.SetPlayerInfo(ctx, *data.PlayerInfo)
+
+	// Update the board
+	board, found := k.GetBoard(ctx)
+	if !found {
+		panic("Leaderboard not found")
+	}
+	listed := board.PlayerInfo
+	replaced := false
+	for i := range listed {
+		if listed[i].Index == data.PlayerInfo.Index {
+			listed[i] = *data.PlayerInfo
+			replaced = true
+			break
+		}
+	}
+	if !replaced {
+		listed = append(listed, *data.PlayerInfo)
+	}
+	k.UpdateBoard(ctx, listed)
 
 	return packetAck, nil
 }

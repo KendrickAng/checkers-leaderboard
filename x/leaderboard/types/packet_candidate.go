@@ -3,7 +3,11 @@ package types
 // ValidateBasic is used for validating the packet
 func (p CandidatePacketData) ValidateBasic() error {
 
-	// TODO: Validate the packet data
+	// return error if player info is incorrect
+	playerInfoErr := p.PlayerInfo.ValidateBasic()
+	if playerInfoErr != nil {
+		return playerInfoErr
+	}
 
 	return nil
 }
